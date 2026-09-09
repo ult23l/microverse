@@ -83,14 +83,3 @@ botão "Carregar novo estado (.json)" no topo da página pra atualizar a
 vila sem precisar gerar o arquivo de novo. Ou rode `python3 gerar_visual.py`
 pra gerar uma nova versão do HTML já com os dados atuais embutidos.
 
-## Próximos passos possíveis (me diga a ordem que prefere)
-
-- Sistema político real: tipos de governo, eleições, golpes, ditadores.
-- Guerras entre clãs/facções (recursos, território, exércitos).
-- Árvore de tecnologia (Idade da Pedra → Bronze → Ferro → ...) que
-  desbloqueia novas profissões e muda a economia.
-- Economia de recursos (comida, materiais) afetando fome/mortalidade.
-- Eventos aleatórios maiores (pragas, secas, descobertas, cismas religiosos).
-- Árvore genealógica visual (gráfica, não só texto) na página HTML.
-- Um jeito mais fácil de visualizar a história (linha do tempo em HTML).
-
