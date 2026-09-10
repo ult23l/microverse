@@ -53,6 +53,16 @@ class Criatura:
         self.anos_juntos = 0                # anos namorando ou casado com o parceiro atual
         self.filhos_ids = []
 
+        # Vida social: memória, relações não-românticas e reputação
+        self.memorias = []            # lista de {ano, tipo, sobre_id, boato} — capada em 20
+        self.relacoes_sociais = {}    # str(id) -> {"tipo": "conhecido"|"amigo(a)"|"rival", "confianca": 0-100}
+        self.reputacao = 50           # o que a comunidade pensa dela (0-100), muda com fofoca
+
+    def adicionar_memoria(self, ano, tipo, sobre_id=None, boato=False):
+        self.memorias.append({"ano": ano, "tipo": tipo, "sobre_id": sobre_id, "boato": boato})
+        if len(self.memorias) > 20:
+            self.memorias.pop(0)
+
     def idade(self, ano_atual):
         return ano_atual - self.ano_nascimento
 
@@ -98,4 +108,11 @@ class Criatura:
             obj.pais_ids = [None, None]
         if not hasattr(obj, "filhos_ids"):
             obj.filhos_ids = []
+        if not hasattr(obj, "memorias"):
+            obj.memorias = []
+        if not hasattr(obj, "relacoes_sociais"):
+            obj.relacoes_sociais = {}
+        if not hasattr(obj, "reputacao"):
+            obj.reputacao = 50
         return obj
+
