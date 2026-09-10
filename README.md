@@ -1,6 +1,3 @@
-# microverse
-literaly a microverse
-
 # Microverso — Ano 1
 
 Base do motor de simulação da sua sociedade. Ainda simples de propósito —
@@ -80,6 +77,65 @@ completa. O líder tem um anel dourado.
 
 Sempre que avançar anos e salvar um novo `estado_microverso.json`, use o
 botão "Carregar novo estado (.json)" no topo da página pra atualizar a
+vila sem precisar gerar o arquivo de novo. Ou rode `python3 gerar_visual.py`
+pra gerar uma nova versão do HTML já com os dados atuais embutidos.
+
+## Economia e sobrevivência (novo)
+
+Cada ano, a tribo produz e consome de verdade:
+
+- **Comida**: produzida por Agricultores, Caçadores, Coletores e Pescadores
+  (cada profissão rende uma quantidade diferente). Consumida por todo mundo
+  (adultos consomem mais que crianças).
+- **Materiais**: produzidos por Artesãos e Construtores, consumidos aos
+  poucos pela manutenção/crescimento da aldeia.
+- **Clima**: todo ano tem uma chance de ser normal, de fartura (+40% na
+  colheita) ou de seca (-40%) — isso já aparece na crônica.
+- **Fome de verdade**: se a comida zera, a mortalidade sobe (principalmente
+  crianças e idosos), a felicidade cai, o estresse sobe, os nascimentos
+  ficam mais raros, e pode rolar briga interna por comida.
+- Quando alguém completa 16 anos e ainda não tem profissão, o motor já
+  atribui uma automaticamente (antes isso não acontecia e a economia ia
+  entrar em colapso conforme a geração fundadora fosse morrendo).
+- `mundo.historico_recursos[ano]` guarda comida/materiais/clima/fome de
+  cada ano — é o que alimenta o gráfico de recursos.
+
+Balanceei os números pra fome ser um evento real (principalmente em anos
+de seca seguidos), não um estado permanente — testei 25 anos e a população
+cresceu de forma sustentável (100 → 135) com secas e farturas aparecendo
+sem quebrar a sociedade.
+
+## Vida social e memória dos NPCs (novo)
+
+Cada criatura agora tem:
+
+- **Memória** (`memorias`): lista das últimas ~20 coisas marcantes que
+  aconteceram com ela ou que ela ouviu falar (nascimentos, mortes de
+  parentes, casamentos, amizades/rivalidades fortes, virada de líder,
+  fofoca) — cada entrada guarda ano, tipo, sobre quem, e se foi ouvida de
+  segunda mão (`boato`).
+- **Relações sociais** (`relacoes_sociais`): não é só romance — todo mundo
+  tem um nível de confiança (0-100) com quem já cruzou. Confiança alta vira
+  "amigo(a)", confiança baixa vira "rival".
+- **Reputação** (`reputacao`): o que a comunidade pensa de alguém, sobe e
+  desce com a fofoca boa/ruim que se espalha sobre a pessoa, e puxa de
+  volta pro neutro aos poucos (fofoca velha perde força). Isso agora **pesa
+  na eleição de líder** — ambição sozinha não basta mais, fama ruim atrapalha.
+- **Encontros sociais**: todo ano, uma fração da população se encontra
+  (com viés pro próprio clã/profissão — colegas de trabalho se veem mais).
+  A compatibilidade de personalidade decide se a relação melhora ou piora.
+- **Fofoca se espalha e se distorce**: quem participa de um encontro tem
+  chance de repassar uma fofoca que sabe sobre um terceiro — e 25% de
+  chance de distorcer (positivo virar negativo ou vice-versa) ao repassar.
+
+Testei 20 anos: reputação variando de verdade entre as pessoas (não fica
+todo mundo em 50), fofoca se espalhando (180+ memórias marcadas como
+"ouviu dizer" numa população de 150), e memórias pessoais tristes/felizes
+acumulando (ex: alguém que perdeu 3 filhos guarda isso na memória).
+
+Use `mundo.imprimir_memorias(id)` pra ver as últimas memórias de qualquer
+pessoa. Na ficha do mapa (`vila_visual.html`) agora também aparece
+reputação, melhor amigo(a), maior rival e as memórias recentes de cada um.
 vila sem precisar gerar o arquivo de novo. Ou rode `python3 gerar_visual.py`
 pra gerar uma nova versão do HTML já com os dados atuais embutidos.
 
