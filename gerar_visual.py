@@ -349,6 +349,23 @@ function zonaParaProfissao(prof) {
   return ZONAS.find(z => z.id === "aldeia");
 }
 
+const DESCRICOES_MEMORIA = {
+  nasceu: (nome) => `o nascimento de ${nome}`,
+  casou: (nome) => `o casamento com ${nome}`,
+  morte_parente: (nome) => `a morte de ${nome}`,
+  amizade_forte: (nome) => `uma grande amizade com ${nome}`,
+  rivalidade_forte: (nome) => `uma rivalidade forte com ${nome}`,
+  fofoca_positiva: (nome) => `algo bom sobre ${nome}`,
+  fofoca_negativa: (nome) => `algo ruim sobre ${nome}`,
+  tornou_lider: (nome) => `a ascensão de ${nome} como líder`,
+  conflito_fome: (nome) => `uma briga com ${nome} por causa da fome`,
+};
+
+function nomeDe(id) {
+  const p = DADOS.criaturas[id];
+  return p ? (p.nome + " " + p.cla) : "alguém";
+}
+
 let DADOS = __DADOS_JSON__;
 
 function idadeDe(pessoa, anoAtual) {
@@ -424,6 +441,19 @@ function selecionar(id, elemento) {
 
   const prefixo = pessoa.status_social && pessoa.status_social !== "comum" ? pessoa.status_social + " · " : "";
 
+  const relacoes = Object.entries(pessoa.relacoes_sociais || {});
+  let melhorAmigo = null, maiorRival = null;
+  relacoes.forEach(([idOutro, r]) => {
+    if (r.tipo === "amigo(a)" && (!melhorAmigo || r.confianca > melhorAmigo.confianca)) melhorAmigo = { id: idOutro, ...r };
+    if (r.tipo === "rival" && (!maiorRival || r.confianca < maiorRival.confianca)) maiorRival = { id: idOutro, ...r };
+  });
+
+  const memoriasHtml = (pessoa.memorias || []).slice(-5).reverse().map(mm => {
+    const desc = DESCRICOES_MEMORIA[mm.tipo];
+    const texto = desc ? desc(nomeDe(mm.sobre_id)) : mm.tipo;
+    return `<li>Ano ${mm.ano}: ${texto}${mm.boato ? " <i>(ouviu dizer)</i>" : ""}</li>`;
+  }).join("") || "<li>nada marcante ainda</li>";
+
   const painel = document.getElementById("painel");
   painel.innerHTML = `
     <h2>${pessoa.nome} ${pessoa.cla}</h2>
@@ -433,22 +463,33 @@ function selecionar(id, elemento) {
     <div class="linha"><b>Saúde</b> ${pessoa.saude}/100
       <div class="barra-bg"><div class="barra-fg" style="width:${pessoa.saude}%"></div></div>
     </div>
+    <div class="linha"><b>Reputação</b> ${pessoa.reputacao ?? 50}/100
+      <div class="barra-bg"><div class="barra-fg" style="width:${pessoa.reputacao ?? 50}%"></div></div>
+    </div>
     <div class="linha"><b>Emoção forte</b> ${emoNome} (${emoValor})</div>
     <div class="linha"><b>Gosta de</b> ${pessoa.gostos.join(", ")}</div>
     <div class="linha"><b>Quer na vida</b> ${pessoa.objetivos.join(", ")}</div>
     <div class="linha"><b>Parceiro(a)</b> ${parceiro ? parceiro.nome + " " + parceiro.cla : "ninguém no momento"}</div>
+    <div class="linha"><b>Melhor amigo(a)</b> ${melhorAmigo ? nomeDe(melhorAmigo.id) : "ninguém ainda"}</div>
+    <div class="linha"><b>Maior rival</b> ${maiorRival ? nomeDe(maiorRival.id) : "ninguém ainda"}</div>
     <div class="linha"><b>Pai</b> ${pai ? pai.nome + " " + pai.cla : "desconhecido"}</div>
     <div class="linha"><b>Mãe</b> ${mae ? mae.nome + " " + mae.cla : "desconhecida"}</div>
     <div class="linha"><b>Filhos</b> ${nomesFilhos.length ? nomesFilhos.join(", ") : "nenhum ainda"}</div>
+    <div class="linha"><b>Memórias recentes</b>
+      <ul style="margin:4px 0 0 18px;padding:0">${memoriasHtml}</ul>
+    </div>
   `;
 }
 
 function atualizarCabecalho() {
   const vivos = Object.values(DADOS.criaturas).filter(c => c.vivo);
   const lider = DADOS.governo && DADOS.criaturas[DADOS.governo.lider_id];
+  const comida = DADOS.recursos ? Math.round(DADOS.recursos.comida) : "?";
+  const materiais = DADOS.recursos ? Math.round(DADOS.recursos.materiais) : "?";
   document.getElementById("stats-header").innerHTML =
     `Ano <b>${DADOS.ano_atual}</b> · População <b>${vivos.length}</b> · Era <b>${DADOS.era_atual}</b>` +
-    (lider ? ` · Líder <b>${lider.nome} ${lider.cla}</b>` : "");
+    (lider ? ` · Líder <b>${lider.nome} ${lider.cla}</b>` : "") +
+    ` · 🌾 <b>${comida}</b> · 🪵 <b>${materiais}</b>`;
 }
 
 function montarLegenda() {
